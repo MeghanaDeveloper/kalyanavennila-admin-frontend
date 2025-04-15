@@ -16,18 +16,16 @@ function App() {
         <ScrollToTop />
 
         <Routes>
-        <Route path="/" element={<Navigate to="/admin" replace />} />
-        <Route path="admin" element={<LoginPage />} />
-        <Route path="admin/login" element={<LoginPage />} />
+          <Route path="/" element={<Navigate to="/admin" replace />} />
+          <Route path="admin" element={<LoginPage />} />
+          <Route path="admin/login" element={<LoginPage />} />
 
-<Route element={<AdminPrivateRoute/>}>
-          <Route path="/admin" element={<SidebarLayout />}>
-
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="users" element={<Users />} />
-            <Route path="users/:id" element={<UserFullDetails />} />
-          </Route>
+          <Route element={<AdminPrivateRoute />}>
+            <Route path="/admin" element={<SidebarLayout />}>
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="users" element={<Users />} />
+              <Route path="users/:id" element={<UserFullDetails />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

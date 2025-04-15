@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import Breadcrumb from "../../components/common/breadcrumb";
 import { FaClipboardUser } from "react-icons/fa6";
 import {  useDispatch, useSelector } from "react-redux";
-import { getAllUsersFullDetails } from "../../services/adminApi's";
+import { getAllUsersFullDetails } from "../../services/adminApis";
 
 
 const Dashboard = () => {
@@ -12,11 +12,13 @@ const Dashboard = () => {
 
     useEffect(() => {
       const fetchUsers = async () => {
-        await getAllUsersFullDetails(dispatch);
+       await getAllUsersFullDetails(dispatch);
+
       };
       fetchUsers();
     }, [dispatch]);
-    
+
+
   return (
     <>
       <Breadcrumb paths={[{ label: "Dashboard", path: "/admin/dashboard" }]} />

@@ -2,16 +2,16 @@ import React, { useEffect, useState } from "react";
 import Breadcrumb from "../../components/common/breadcrumb";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAllUsersFullDetails } from "../../services/adminApi's";
-import { MdOutlineVisibility } from "react-icons/md";
+import { getAllUsersFullDetails } from "../../services/adminApis";
+import { MdOutlineDeleteForever, MdOutlineVisibility } from "react-icons/md";
+import { deleteProfileDetails } from "../../services/adminProfileStatusApis";
+import toast from "react-hot-toast";
 
 const Users = () => {
-  const allUsersData = useSelector(
-    (state) => state?.userReducer?.userDetails?.result
-  );
+  const allUsersData = useSelector((state) => state?.userReducer?.userDetails?.result);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 6;
+  const usersPerPage = 8;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -21,18 +21,29 @@ const Users = () => {
       await getAllUsersFullDetails(dispatch);
     };
     fetchUsers();
-  }, [dispatch]);
+  }, [dispatch, ]);
 
   const handleFullDetails = (id) => {
     navigate(`/admin/users/${id}`);
   };
 
+  const handleDeleteFullDetails = async (id) => {
+    const confirm = window.confirm("Are you sure you want to delete this user?");
+    if (!confirm) return;
+  try{
+    await dispatch(deleteProfileDetails(id));
+    await getAllUsersFullDetails(dispatch)
+  }
+   catch(err){
+    toast.error(err.message)
+   }
+  };
+
   // Pagination Logic
-  const totalPages = Math.ceil(allUsersData.length / usersPerPage);
+  const totalPages = Math.ceil(allUsersData?.length / usersPerPage);
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = allUsersData.slice(indexOfFirstUser, indexOfLastUser);
-  console.log(currentUsers, "s");
+  const currentUsers = allUsersData?.slice(indexOfFirstUser, indexOfLastUser);
   return (
     <>
       <Breadcrumb paths={[{ label: "Users", path: "/admin/users" }]} />
@@ -49,19 +60,20 @@ const Users = () => {
               <th className="px-4 py-2">Mobile</th>
               <th className="px-4 py-2">Date of Birth</th>
               <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">View Document</th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody className="text-center">
-            {currentUsers?.map((user) => (
+            {
+            currentUsers && currentUsers.length > 0 ? (
+            currentUsers?.map((user) => (
               <tr key={user._id} className="border-t hover:bg-gray-50">
                 <td className="px-4 py-2">{user.accountId}</td>
 
                 <td className="px-4 py-2">
-                  <div className="flex items-center  gap-5">
-                    {console.log(user.profilePic)}
+                  <div className="flex items-center  gap-3">
                     <img
-                      src={user.profilePic}
+                      src={user.profilePic || null}
                       alt="profile"
                       className="inline-block size-12 rounded-full ring-2 ring-white"
                     />
@@ -71,7 +83,7 @@ const Users = () => {
                   </div>
                 </td>
 
-                <td className="px-4 py-2">{user.email}</td>
+                <td className="px-12 py-2">{user.email}</td>
                 <td className="px-4 py-2">{user.mobile}</td>
                 <td className="px-4 py-2">
                   {user.dateOfBirth
@@ -84,10 +96,10 @@ const Users = () => {
                 </td>
                 <td className="px-4 py-2">
                   <span
-                    className={`px-4 py-2 rounded-full text-white text-sm ${
-                      user.isProfileStatus === "pending"
+                    className={`px-4 py-2 rounded-full font-bold text-white text-sm ${
+                      user.isProfileStatus === "Pending"
                         ? "bg-yellow-500"
-                        : user.isProfileStatus === "approved"
+                        : user.isProfileStatus === "Approved"
                         ? "bg-green-500"
                         : "bg-red-500"
                     }`}
@@ -97,25 +109,40 @@ const Users = () => {
                 </td>
                 <td
                   className="text-center"
-                  onClick={() => handleFullDetails(user._id)}
                 >
-                  <div className="flex items-center justify-center h-full group relative cursor-pointer">
+                  <div className="flex justify-center items-center gap-4">
+                  <div  onClick={() => handleFullDetails(user._id)} className="flex items-center justify-center h-full group relative cursor-pointer">
                     <MdOutlineVisibility size={24} className="text-primary" />
                     <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
-                      View Application
+                      View Profile
                     </span>
+                  </div>
+
+                  <div  onClick={() => handleDeleteFullDetails(user._id)} className="flex items-center justify-center h-full group relative cursor-pointer">
+                    <MdOutlineDeleteForever size={24} className="text-red-700" />
+                    <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
+                      Delete Profile
+                    </span>
+                  </div>
                   </div>
                 </td>
               </tr>
-            ))}
+             ))
+            ) : (
+              <tr>
+                <td colSpan="7" className="text-center py-6 text-black font-bold">
+                  No users found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
-      <div className="flex justify-center items-center mt-9 gap-2">
+      <div className="flex justify-center items-center mt-9 gap-4">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+          className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold border-primary border-2"
         >
           Prev
         </button>
@@ -125,7 +152,7 @@ const Users = () => {
             onClick={() => setCurrentPage(page)}
             className={`px-3 py-1 rounded ${
               page === currentPage
-                ? "bg-blue-500 text-white"
+                ? "bg-primary text-white"
                 : "bg-gray-100 hover:bg-gray-200"
             }`}
           >
@@ -136,7 +163,7 @@ const Users = () => {
           onClick={() =>
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
-          className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+          className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold border-primary border-2"
         >
           Next
         </button>

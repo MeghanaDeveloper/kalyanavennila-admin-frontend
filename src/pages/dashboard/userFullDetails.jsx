@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import Breadcrumb from "../../components/common/breadcrumb";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -14,33 +14,61 @@ import {
   FaBirthdayCake,
   FaHeart,
 } from "react-icons/fa";
-import { useSelector } from "react-redux";
-import { getDocumentURL } from "../../services/adminApi's";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllUsersFullDetails,
+  getDocumentURL,
+} from "../../services/adminApis";
+import toast from "react-hot-toast";
+import {
+  approveProfileDetails,
+  rejectProfileDetails,
+} from "../../services/adminProfileStatusApis";
 
 const UserFullDetails = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
 
   const [previewURL, setPreviewURL] = useState("");
 
-  const allUsersData = useSelector(
-    (state) => state?.userReducer?.userDetails?.result
-  );
+  const allUsersData = useSelector( (state) => state?.userReducer?.userDetails?.result);
 
-  // Find the user by ID
   const userData = allUsersData?.find((u) => u._id === id);
 
-  const handleViewDocument = async () => {
+  const handleViewDocument = async (e) => {
+    e.preventDefault();
     if (!userData?.email) return;
+
     const response = await getDocumentURL(userData.email);
-    if (response.success) {
-      setPreviewURL(response?.data?.url);
+    if (response.success && response.data) {
+      const url = response.data;
+      setPreviewURL(url);
+      window.open(url, "_blank");
     }
   };
 
-  if (!userData) {
-    return <div className="p-4">User not found</div>;
-  }
-  console.log(previewURL);
+  const handleApproveProfile = async (profileId) => {
+    try {
+      await dispatch(approveProfileDetails(profileId));
+      await getAllUsersFullDetails(dispatch);
+    } catch (error) {
+      toast.error(error.message);
+    }
+
+    // if (result?.success) {
+    //   console.log("Profile approved successfully");
+    // }
+  };
+
+  const handleRejectProfile = async (profileId) => {
+    try {
+      await dispatch(rejectProfileDetails(profileId));
+      await getAllUsersFullDetails(dispatch);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   return (
     <>
       <Breadcrumb
@@ -186,7 +214,7 @@ const UserFullDetails = () => {
                 <p className="font-bold text-gray-700">Documents:</p>
                 <Link
                   to={previewURL}
-                  target="_blank"
+                  // target="_blank"
                   onClick={handleViewDocument}
                   className="text-blue-500 font-bold hover:underline hover:text-gray-500"
                 >
@@ -242,6 +270,36 @@ const UserFullDetails = () => {
                 <p className="text-gray-600">{userData?.partnerReligion}</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end items-center gap-9 px-5 md:px-20 py-10 flex-wrap">
+          <div>
+            <button
+              onClick={() => handleApproveProfile(userData?._id)}
+              disabled={userData?.isProfileStatus === "Approved"}
+              className={`button-styles px-4 ${
+                userData?.isProfileStatus === "Approved"
+                  ? "bg-gray-400 cursor-not-allowed opacity-60"
+                  : "button-styles "
+              }`}
+            >
+              Approve Profile
+            </button>
+          </div>
+
+          <div>
+            <button
+              onClick={() => handleRejectProfile(userData?._id)}
+              disabled={userData?.isProfileStatus === "Rejected"}
+              className={`button-styles px-6 ${
+                userData?.isProfileStatus === "Rejected"
+                  ? "bg-gray-400 cursor-not-allowed opacity-60"
+                  : "button-styles"
+              }`}
+            >
+              Reject Profile
+            </button>
           </div>
         </div>
       </div>

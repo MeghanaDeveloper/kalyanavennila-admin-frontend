@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
-import { adminLoginData } from "../../services/adminApi's";
+import { adminLoginData } from "../../services/adminApis";
 import Navbar from "../../components/navbar/navbar";
 import Footer from "../../components/footer/footer";
 
