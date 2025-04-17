@@ -1,39 +1,64 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Breadcrumb from "../../components/common/breadcrumb";
 import { FaClipboardUser } from "react-icons/fa6";
-import {  useDispatch, useSelector } from "react-redux";
-import { getAllUsersFullDetails } from "../../services/adminApis";
-
+import {  getCountOfFieldDetails } from "../../services/adminApis";
 
 const Dashboard = () => {
-    const allUsersData = useSelector((state) => state.userReducer.userDetails)
-     
-    const dispatch = useDispatch();
+  const [usersCount, setUsersCount] = useState({});
 
-    useEffect(() => {
-      const fetchUsers = async () => {
-       await getAllUsersFullDetails(dispatch);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const countResponse = await getCountOfFieldDetails();
+      setUsersCount(countResponse.data);
 
-      };
-      fetchUsers();
-    }, [dispatch]);
-
+    };
+    fetchUsers();
+  }, []);
 
   return (
     <>
       <Breadcrumb paths={[{ label: "Dashboard", path: "/admin/dashboard" }]} />
 
-      <h1 className="text-2xl font-bold mb-14 text-primary ">Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-14 text-primary">Dashboard</h1>
 
-      <div className="flex justify-start items-center gap-16">
-        <div className="flex flex-col md:flex-row gap-14 p-10 bg-white rounded-lg items-center justify-center shadow-md">
-          <div className="w-[75px] h-[75px] rounded-lg flex items-center justify-center bg-red-100">
-            <FaClipboardUser size={32} />
+      <div className="bg-white rounded-2xl shadow-md p-10 mb-9 w-[24vw] flex items-center justify-center gap-6">
+          <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-red-100 text-red-600">
+            <FaClipboardUser size={28} />
           </div>
+          <div className="flex-1 text-right">
+            <h2 className="text-3xl font-bold text-red-600">{usersCount?.totalUsers}</h2>
+            <p className="text-gray-700 font-medium">Total Users</p>
+          </div>
+        </div>
 
-          <div className="flex flex-col items-center md:items-end justify-center gap-3">
-            <h2 className="text-3xl font-semibold text-red-600">{allUsersData?.usersCount}</h2>
-            <p className="text-primary text-xl font-bold">Total Users</p>
+      <div className="grid lg:grid-cols-3 gap-10 md:grid-cols-2 grid-cols-1">
+        <div className="bg-white rounded-2xl shadow-md p-10 flex items-center justify-center gap-6">
+          <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-green-100 text-green-600">
+            <FaClipboardUser size={28} />
+          </div>
+          <div className="flex-1 text-right">
+            <h2 className="text-3xl font-bold text-green-600">{usersCount?.approvedProfiles}</h2>
+            <p className="text-gray-700 font-medium">Approved Profiles</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-md p-10 flex items-center justify-center gap-6">
+          <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-yellow-100 text-yellow-600">
+            <FaClipboardUser size={28} />
+          </div>
+          <div className="flex-1 text-right">
+            <h2 className="text-3xl font-bold text-yellow-600">{usersCount?.pendingProfiles}</h2>
+            <p className="text-gray-700 font-medium">Pending Profiles</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-md p-10 flex items-center justify-center gap-6">
+          <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-red-200 text-red-700">
+            <FaClipboardUser size={28} />
+          </div>
+          <div className="flex-1 text-right">
+            <h2 className="text-3xl font-bold text-red-600">{usersCount?.rejectedProfiles}</h2>
+            <p className="text-gray-700 font-medium">Rejected Profiles</p>
           </div>
         </div>
       </div>

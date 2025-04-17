@@ -4,10 +4,10 @@ import AdminPrivateRoute from "./routes/privateRoute";
 import LoginPage from "./pages/login/loginPage";
 import ScrollToTop from "./components/common/scrollToTop";
 import SidebarLayout from "./components/layout/sidebarLayout";
-import Profile from "./pages/dashboard/profile";
 import Dashboard from "./pages/dashboard/dashboard";
 import Users from "./pages/dashboard/users";
 import UserFullDetails from "./pages/dashboard/userFullDetails";
+import Reports from "./pages/dashboard/reports";
 
 function App() {
   return (
@@ -25,6 +25,7 @@ function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="users" element={<Users />} />
               <Route path="users/:id" element={<UserFullDetails />} />
+              <Route path="reports" element={<Reports />} />
             </Route>
           </Route>
         </Routes>

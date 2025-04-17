@@ -8,7 +8,9 @@ import { deleteProfileDetails } from "../../services/adminProfileStatusApis";
 import toast from "react-hot-toast";
 
 const Users = () => {
-  const allUsersData = useSelector((state) => state?.userReducer?.userDetails?.result);
+  const allUsersData = useSelector(
+    (state) => state?.userReducer?.userDetails?.result
+  );
 
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 8;
@@ -21,22 +23,23 @@ const Users = () => {
       await getAllUsersFullDetails(dispatch);
     };
     fetchUsers();
-  }, [dispatch, ]);
+  }, [dispatch]);
 
   const handleFullDetails = (id) => {
     navigate(`/admin/users/${id}`);
   };
 
   const handleDeleteFullDetails = async (id) => {
-    const confirm = window.confirm("Are you sure you want to delete this user?");
+    const confirm = window.confirm(
+      "Are you sure you want to delete this user?"
+    );
     if (!confirm) return;
-  try{
-    await dispatch(deleteProfileDetails(id));
-    await getAllUsersFullDetails(dispatch)
-  }
-   catch(err){
-    toast.error(err.message)
-   }
+    try {
+      await dispatch(deleteProfileDetails(id));
+      await getAllUsersFullDetails(dispatch);
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
 
   // Pagination Logic
@@ -48,9 +51,9 @@ const Users = () => {
     <>
       <Breadcrumb paths={[{ label: "Users", path: "/admin/users" }]} />
 
-      <h1 className="text-2xl font-bold mb-14 text-primary">Users</h1>
+      <h1 className="text-2xl font-bold mb-10 text-primary">Users</h1>
 
-      <div className="overflow-x-auto rounded-lg shadow-md border">
+      <div className=" rounded-lg shadow-md border">
         <table className="min-w-full text-lg rounded-lg overflow-hidden">
           <thead className="bg-gray-100 text-center text-primary font-bold">
             <tr>
@@ -64,73 +67,85 @@ const Users = () => {
             </tr>
           </thead>
           <tbody className="text-center">
-            {
-            currentUsers && currentUsers.length > 0 ? (
-            currentUsers?.map((user) => (
-              <tr key={user._id} className="border-t hover:bg-gray-50">
-                <td className="px-4 py-2">{user.accountId}</td>
+            {currentUsers && currentUsers.length > 0 ? (
+              currentUsers?.map((user) => (
+                <tr key={user._id} className="border-t hover:bg-gray-50">
+                  <td className="px-4 py-2">{user.accountId}</td>
 
-                <td className="px-4 py-2">
-                  <div className="flex items-center  gap-3">
-                    <img
-                      src={user.profilePic || null}
-                      alt="profile"
-                      className="inline-block size-12 rounded-full ring-2 ring-white"
-                    />
-                    <div className="text-sm font-medium">
-                      {user.surName} {user.firstName} {user.lastName}
+                  <td className="px-4 py-2">
+                    <div className="flex items-center  gap-3">
+                      <img
+                        src={user.profilePic || null}
+                        alt="profile"
+                        className="inline-block size-12 rounded-full ring-2 ring-white"
+                      />
+                      <div className="text-sm font-medium">
+                        {user.surName} {user.firstName} {user.lastName}
+                      </div>
                     </div>
-                  </div>
-                </td>
+                  </td>
 
-                <td className="px-12 py-2">{user.email}</td>
-                <td className="px-4 py-2">{user.mobile}</td>
-                <td className="px-4 py-2">
-                  {user.dateOfBirth
-                    ? new Date(user.dateOfBirth).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })
-                    : "_"}
-                </td>
-                <td className="px-4 py-2">
-                  <span
-                    className={`px-4 py-2 rounded-full font-bold text-white text-sm ${
-                      user.isProfileStatus === "Pending"
-                        ? "bg-yellow-500"
-                        : user.isProfileStatus === "Approved"
-                        ? "bg-green-500"
-                        : "bg-red-500"
-                    }`}
-                  >
-                    {user.isProfileStatus}
-                  </span>
-                </td>
-                <td
-                  className="text-center"
-                >
-                  <div className="flex justify-center items-center gap-4">
-                  <div  onClick={() => handleFullDetails(user._id)} className="flex items-center justify-center h-full group relative cursor-pointer">
-                    <MdOutlineVisibility size={24} className="text-primary" />
-                    <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
-                      View Profile
+                  <td className="px-12 py-2">{user.email}</td>
+                  <td className="px-4 py-2">{user.mobile}</td>
+                  <td className="px-4 py-2">
+                    {user.dateOfBirth
+                      ? new Date(user.dateOfBirth).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })
+                      : "_"}
+                  </td>
+                  <td className="px-4 py-2">
+                    <span
+                      className={`px-4 py-2 rounded-full font-bold text-white text-sm ${
+                        user.isProfileStatus === "Pending"
+                          ? "bg-yellow-500"
+                          : user.isProfileStatus === "Approved"
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      }`}
+                    >
+                      {user.isProfileStatus}
                     </span>
-                  </div>
+                  </td>
+                  <td className="text-center">
+                    <div className="flex justify-center items-center gap-4">
+                      <div
+                        onClick={() => handleFullDetails(user._id)}
+                        className="flex items-center justify-center h-full group relative cursor-pointer"
+                      >
+                        <MdOutlineVisibility
+                          size={24}
+                          className="text-primary"
+                        />
+                        <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
+                          View Profile
+                        </span>
+                      </div>
 
-                  <div  onClick={() => handleDeleteFullDetails(user._id)} className="flex items-center justify-center h-full group relative cursor-pointer">
-                    <MdOutlineDeleteForever size={24} className="text-red-700" />
-                    <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
-                      Delete Profile
-                    </span>
-                  </div>
-                  </div>
-                </td>
-              </tr>
-             ))
+                      <div
+                        onClick={() => handleDeleteFullDetails(user._id)}
+                        className="flex items-center justify-center h-full group relative cursor-pointer"
+                      >
+                        <MdOutlineDeleteForever
+                          size={24}
+                          className="text-red-700"
+                        />
+                        <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
+                          Delete Profile
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))
             ) : (
               <tr>
-                <td colSpan="7" className="text-center py-6 text-black font-bold">
+                <td
+                  colSpan="7"
+                  className="text-center py-6 text-black font-bold"
+                >
                   No users found.
                 </td>
               </tr>

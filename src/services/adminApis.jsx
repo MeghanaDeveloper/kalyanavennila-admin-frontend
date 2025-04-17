@@ -55,6 +55,7 @@ export const adminLoginData = (userName, password) => async (dispatch) => {
   }
 };
 
+//get all
 export const getAllUsersFullDetails = async (dispatch) => {
   try {
     const response = await axios.get(`${BASE_URL}/all-users`);
@@ -86,9 +87,10 @@ export const getAllUsersFullDetails = async (dispatch) => {
 
 //document url
 export const getDocumentURL = async (email) => {
-  console.log("first");
-  console.log(email);
   try {
+    // const token = localStorage.getItem("adminLoginToken")
+    // if (!token) return;
+    
     const response = await axios.get(`${BASE_URL}/stream-document`, {
       params: { email },
       responseType: "blob",
@@ -102,6 +104,41 @@ export const getDocumentURL = async (email) => {
     };
   } 
   catch (error) {
+    console.log(error);
+    const errors = error.response?.data?.error;
+    toast.error(errors, {
+      position: "top-center",
+      autoClose: 3000,
+      className: "custom-toast",
+    });
+    return {
+      success: false,
+      errors: errors,
+    };
+  }
+};
+
+//
+export const getCountOfFieldDetails = async () => {
+  try {
+    const token = localStorage.getItem("adminLoginToken")
+    if (!token) return;
+
+    const response = await axios.get(`${BASE_URL}/fields-count`,
+      {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    }
+    );
+    console.log(response);
+    if (response && response.data && response.status === 200) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    }
+  } catch (error) {
     console.log(error);
     const errors = error.response?.data?.error;
     toast.error(errors, {

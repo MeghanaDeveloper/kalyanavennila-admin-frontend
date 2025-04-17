@@ -107,7 +107,7 @@ const LoginPage = () => {
                 </div>
               </div>
 
-              <p
+              {/* <p
                 //   onClick={() => [
                 //     setIsLoginOpen(false),
                 //     setIsSignUpOpen(true),
@@ -118,7 +118,7 @@ const LoginPage = () => {
                 }`}
               >
                 Forgot Password?
-              </p>
+              </p> */}
 
               <div className="mt-6 mb-3">
                 <button
