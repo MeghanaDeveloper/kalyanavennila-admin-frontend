@@ -62,6 +62,98 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      <div className="grid gap-6 mt-10 md:grid-cols-2">
+  {usersCount?.religion && (
+    <div className="bg-white shadow-lg rounded-2xl p-6 transition-all hover:shadow-xl">
+      <h2 className="text-xl font-bold text-primary mb-4">Religion Wise Registrations</h2>
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="bg-orange-100">
+            <th className="p-3">Religion</th>
+            <th className="p-3">Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          {usersCount.religion.map((item, index) => (
+            <tr key={index} className="border-t hover:bg-gray-50">
+              <td className="p-3">{item._id || "Not Provided"}</td>
+              <td className="p-3">{item.count}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  {usersCount?.caste && (
+    <div className="bg-white shadow-lg rounded-2xl p-6 transition-all hover:shadow-xl">
+      <h2 className="text-xl font-bold text-primary mb-4">Caste Wise Registrations</h2>
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="bg-orange-100">
+            <th className="p-3">Caste</th>
+            <th className="p-3">Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          {usersCount.caste.map((item, index) => (
+            <tr key={index} className="border-t hover:bg-gray-50">
+              <td className="p-3">{item._id || "Not Provided"}</td>
+              <td className="p-3">{item.count}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  {usersCount?.job && (
+    <div className="bg-white shadow-lg rounded-2xl p-6 transition-all hover:shadow-xl">
+      <h2 className="text-xl font-bold text-primary mb-4">Job Wise Registrations</h2>
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="bg-orange-100">
+            <th className="p-3">Job</th>
+            <th className="p-3">Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          {usersCount.job.map((item, index) => (
+            <tr key={index} className="border-t hover:bg-gray-50">
+              <td className="p-3">{item._id || "Not Provided"}</td>
+              <td className="p-3">{item.count}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+
+  {usersCount?.motherTongue && (
+    <div className="bg-white shadow-lg rounded-2xl p-6 transition-all hover:shadow-xl">
+      <h2 className="text-xl font-bold text-primary mb-4">Mother Tongue Registrations</h2>
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="bg-orange-100">
+            <th className="p-3">Mother Tongue</th>
+            <th className="p-3">Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          {usersCount.motherTongue.map((item, index) => (
+            <tr key={index} className="border-t hover:bg-gray-50">
+              <td className="p-3">{item._id || "Not Provided"}</td>
+              <td className="p-3">{item.count}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
+
+
     </>
   );
 };

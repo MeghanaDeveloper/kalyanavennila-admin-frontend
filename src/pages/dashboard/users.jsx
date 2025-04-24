@@ -47,47 +47,45 @@ const Users = () => {
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = allUsersData?.slice(indexOfFirstUser, indexOfLastUser);
+
   return (
     <>
       <Breadcrumb paths={[{ label: "Users", path: "/admin/users" }]} />
+      <h1 className="text-2xl font-bold mb-6 text-primary">Users</h1>
 
-      <h1 className="text-2xl font-bold mb-10 text-primary">Users</h1>
-
-      <div className=" rounded-lg shadow-md border">
-        <table className="min-w-full text-lg rounded-lg overflow-hidden">
-          <thead className="bg-gray-100 text-center text-primary font-bold">
+      <div className="overflow-x-auto rounded-lg shadow-md border w-full">
+        <table className="min-w-full text-sm sm:text-base text-left">
+          <thead className="bg-gray-100 text-primary font-bold text-center">
             <tr>
-              <th className="px-4 py-2">Account ID</th>
-              <th className="px-4 py-2 ">Full Name</th>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Mobile</th>
-              <th className="px-4 py-2">Date of Birth</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Actions</th>
+              <th className="px-2 sm:px-4 py-2">Account ID</th>
+              <th className="px-2 sm:px-4 py-2">Full Name</th>
+              <th className="px-2 sm:px-4 py-2">Email</th>
+              <th className="px-2 sm:px-4 py-2">Mobile</th>
+              <th className="px-2 sm:px-4 py-2">Date of Birth</th>
+              <th className="px-2 sm:px-4 py-2">Status</th>
+              <th className="px-2 sm:px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody className="text-center">
             {currentUsers && currentUsers.length > 0 ? (
-              currentUsers?.map((user) => (
+              currentUsers.map((user) => (
                 <tr key={user._id} className="border-t hover:bg-gray-50">
-                  <td className="px-4 py-2">{user.accountId}</td>
-
-                  <td className="px-4 py-2">
-                    <div className="flex items-center  gap-3">
+                  <td className="px-2 sm:px-4 py-2">{user.accountId}</td>
+                  <td className="px-2 sm:px-4 py-2">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <img
                         src={user.profilePic || null}
                         alt="profile"
-                        className="inline-block size-12 rounded-full ring-2 ring-white"
+                        className="inline-block size-10 sm:size-12 rounded-full ring-2 ring-white"
                       />
                       <div className="text-sm font-medium">
                         {user.surName} {user.firstName} {user.lastName}
                       </div>
                     </div>
                   </td>
-
-                  <td className="px-12 py-2">{user.email}</td>
-                  <td className="px-4 py-2">{user.mobile}</td>
-                  <td className="px-4 py-2">
+                  <td className="px-2 sm:px-4 py-2">{user.email}</td>
+                  <td className="px-2 sm:px-4 py-2">{user.mobile}</td>
+                  <td className="px-2 sm:px-4 py-2">
                     {user.dateOfBirth
                       ? new Date(user.dateOfBirth).toLocaleDateString("en-GB", {
                           day: "numeric",
@@ -96,9 +94,9 @@ const Users = () => {
                         })
                       : "_"}
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-2 sm:px-4 py-2">
                     <span
-                      className={`px-4 py-2 rounded-full font-bold text-white text-sm ${
+                      className={`px-3 py-1 rounded-full font-bold text-white text-xs sm:text-sm ${
                         user.isProfileStatus === "Pending"
                           ? "bg-yellow-500"
                           : user.isProfileStatus === "Approved"
@@ -109,29 +107,22 @@ const Users = () => {
                       {user.isProfileStatus}
                     </span>
                   </td>
-                  <td className="text-center">
-                    <div className="flex justify-center items-center gap-4">
+                  <td className="px-2 sm:px-4 py-2">
+                    <div className="flex justify-center items-center gap-2 sm:gap-4">
                       <div
                         onClick={() => handleFullDetails(user._id)}
                         className="flex items-center justify-center h-full group relative cursor-pointer"
                       >
-                        <MdOutlineVisibility
-                          size={24}
-                          className="text-primary"
-                        />
+                        <MdOutlineVisibility size={20} className="text-primary" />
                         <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
                           View Profile
                         </span>
                       </div>
-
                       <div
                         onClick={() => handleDeleteFullDetails(user._id)}
                         className="flex items-center justify-center h-full group relative cursor-pointer"
                       >
-                        <MdOutlineDeleteForever
-                          size={24}
-                          className="text-red-700"
-                        />
+                        <MdOutlineDeleteForever size={20} className="text-red-700" />
                         <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
                           Delete Profile
                         </span>
@@ -142,10 +133,7 @@ const Users = () => {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan="7"
-                  className="text-center py-6 text-black font-bold"
-                >
+                <td colSpan="7" className="text-center py-6 text-black font-bold">
                   No users found.
                 </td>
               </tr>
@@ -154,7 +142,7 @@ const Users = () => {
         </table>
       </div>
 
-      <div className="flex justify-center items-center mt-9 gap-4">
+      <div className="flex flex-wrap justify-center items-center mt-8 gap-2 sm:gap-4">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold border-primary border-2"
@@ -175,9 +163,7 @@ const Users = () => {
           </button>
         ))}
         <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
           className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold border-primary border-2"
         >
           Next

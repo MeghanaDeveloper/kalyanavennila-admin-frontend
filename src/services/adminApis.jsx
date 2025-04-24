@@ -30,28 +30,28 @@ export const adminLoginData = (userName, password) => async (dispatch) => {
     }
   } catch (error) {
     let errorMessages = [];
-    if (error.response && error.response.data && error.response.data.error) {
-      if (Array.isArray(error.response.data.error)) {
-        errorMessages = error.response.data.error.map((err) => err.msg);
-      } else if (typeof error.response.data.error === "string") {
-        errorMessages = [error.response.data.error];
-      } else {
-        errorMessages = ["An unknown error occurred"];
-      }
-    } else {
-      errorMessages = ["A network error occurred. Please try again later."];
-    }
-    errorMessages.forEach((message) => {
-      toast.error(message, {
-        position: "top-center",
-        autoClose: 5000,
-        className: "custom-toast",
-      });
-    });
-    return {
-      success: false,
-      errors: errorMessages,
-    };
+        if (error.response && error.response.data && error.response.data.error) {
+            if (Array.isArray(error.response.data.error)) {
+                errorMessages = error.response.data.error.map(err => err.msg);
+            } else if (typeof error.response.data.error === 'string') {
+                errorMessages = [error.response.data.error];
+            } else {
+                errorMessages = ['An unknown error occurred'];
+            }
+        } else {
+            errorMessages = ['A network error occurred. Please try again later.'];
+        }
+        errorMessages.forEach(message => {
+            toast.error(message, {
+                position: "top-center",
+                autoClose: 5000,
+                className: 'custom-toast'
+            });
+        });
+        return { 
+            success: false, 
+            errors: errorMessages 
+        };
   }
 };
 
@@ -105,19 +105,28 @@ export const getDocumentURL = async (email) => {
   } 
   catch (error) {
     console.log(error);
-    const errors = error.response?.data?.error;
-    toast.error(errors, {
-      position: "top-center",
-      autoClose: 3000,
-      className: "custom-toast",
-    });
-    return {
-      success: false,
-      errors: errors,
-    };
-  }
-};
+    if (
+      error.response &&
+      error.response.data instanceof Blob &&
+      error.response.data.type === "application/json"
+    ) {
+      const errorText = await error.response.data.text();
+      const errorJson = JSON.parse(errorText);
+      const errorMessage = errorJson.error;
 
+      toast.error(errorMessage, {
+        position: "top-center",
+        autoClose: 3000,
+        className: "custom-toast",
+      });
+
+      return {
+        success: false,
+        errors: errorMessage,
+      };
+    }
+};
+}
 //
 export const getCountOfFieldDetails = async () => {
   try {
