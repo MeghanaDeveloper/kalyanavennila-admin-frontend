@@ -45,19 +45,18 @@ export const approveProfileDetails = (profileId) => async (dispatch) => {
 }
 
 //reject
-export const rejectProfileDetails = (profileId) => async (dispatch) => {
+export const rejectProfileDetails = (profileId, reason) => async (dispatch) => {
     try {
         const token = localStorage.getItem("adminLoginToken")
         if (!token) return;
 
-        const response = await axios.patch(`${BASE_URL}/reject-profile/${profileId}`,{} ,
+        const response = await axios.patch(`${BASE_URL}/reject-profile/${profileId}`,{reason} ,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             }
         )
-        console.log(response,'rejct')
         if (response && response.data && response.status === 200) {
             dispatch(setUpdateProfileStatus(response.data.user))
             toast.success(response.data.message, {
@@ -85,8 +84,7 @@ export const rejectProfileDetails = (profileId) => async (dispatch) => {
     }
 }
 
-
-
+//delete
 export const deleteProfileDetails = (profileId) => async (dispatch) => {
     try {
         const token = localStorage.getItem("adminLoginToken")
@@ -101,6 +99,46 @@ export const deleteProfileDetails = (profileId) => async (dispatch) => {
         )
         if (response && response.data && response.status === 200) {
             dispatch(setDeleteUserById(profileId))
+            toast.success(response.data.message, {
+                position: "top-center",
+                autoClose: 3000,
+                className: 'custom-toast'
+            });
+            return {
+                success: true,
+                data: response.data
+            };
+        }
+    }
+    catch (error) {
+        const errors = error.response.data.error
+        toast.error(errors, {
+            position: "top-center",
+            autoClose: 3000,
+            className: 'custom-toast'
+        });
+        return {
+            success: false,
+            errors: errors
+        };
+    }
+}
+
+//block
+export const blockProfileDetails = (profileId, reason) => async (dispatch) => {
+    try {
+        const token = localStorage.getItem("adminLoginToken")
+        if (!token) return;
+
+        const response = await axios.patch(`${BASE_URL}/block-profile/${profileId}`,{reason} ,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        )
+        if (response && response.data && response.status === 200) {
+            dispatch(setUpdateProfileStatus(response.data.user))
             toast.success(response.data.message, {
                 position: "top-center",
                 autoClose: 3000,

@@ -13,6 +13,7 @@ const Users = () => {
   );
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterStatus, setFilterStatus] = useState("All");
   const usersPerPage = 8;
 
   const navigate = useNavigate();
@@ -42,16 +43,39 @@ const Users = () => {
     }
   };
 
+  // Filtered Users
+  const filteredUsers =
+    filterStatus === "All"
+      ? allUsersData
+      : allUsersData?.filter((user) => user.isProfileStatus === filterStatus);
+
   // Pagination Logic
-  const totalPages = Math.ceil(allUsersData?.length / usersPerPage);
+  const totalPages = Math.ceil(filteredUsers?.length / usersPerPage);
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = allUsersData?.slice(indexOfFirstUser, indexOfLastUser);
+  const currentUsers = filteredUsers?.slice(indexOfFirstUser, indexOfLastUser);
 
   return (
     <>
       <Breadcrumb paths={[{ label: "Users", path: "/admin/users" }]} />
-      <h1 className="text-2xl font-bold mb-6 text-primary">Users</h1>
+      <h1 className="text-2xl font-bold mb-2 text-primary">Users</h1>
+
+      <div className="flex flex-wrap justify-end items-center mb-9">
+        <div className="flex gap-2 items-center">
+          <label className="text-lg  text-gray-700">Filter by Status:</label>
+          <select
+            className="border border-gray-500 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-44"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="All">All</option>
+            <option value="Approved">Approved Profiles</option>
+            <option value="Rejected">Rejected Profiles</option>
+            <option value="Pending">Pending Profiles</option>
+            <option value="Blocked">Blocked Profiles</option>
+          </select>
+        </div>
+      </div>
 
       <div className="overflow-x-auto rounded-lg shadow-md border w-full">
         <table className="min-w-full text-sm sm:text-base text-left">
@@ -61,9 +85,9 @@ const Users = () => {
               <th className="px-2 sm:px-4 py-2">Full Name</th>
               <th className="px-2 sm:px-4 py-2">Email</th>
               <th className="px-2 sm:px-4 py-2">Mobile</th>
-              <th className="px-2 sm:px-4 py-2">Date of Birth</th>
               <th className="px-2 sm:px-4 py-2">Status</th>
-              <th className="px-2 sm:px-4 py-2">Actions</th>
+              <th className="px-2 sm:px-4 py-2">View Profile</th>
+              <th className="px-2 sm:px-4 py-2">Delete Profile</th>
             </tr>
           </thead>
           <tbody className="text-center">
@@ -86,54 +110,56 @@ const Users = () => {
                   <td className="px-2 sm:px-4 py-2">{user.email}</td>
                   <td className="px-2 sm:px-4 py-2">{user.mobile}</td>
                   <td className="px-2 sm:px-4 py-2">
-                    {user.dateOfBirth
-                      ? new Date(user.dateOfBirth).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })
-                      : "_"}
-                  </td>
-                  <td className="px-2 sm:px-4 py-2">
                     <span
-                      className={`px-3 py-1 rounded-full font-bold text-white text-xs sm:text-sm ${
+                      className={`px-4 py-2 rounded-full font-bold text-white text-xs sm:text-sm ${
                         user.isProfileStatus === "Pending"
-                          ? "bg-yellow-500"
-                          : user.isProfileStatus === "Approved"
-                          ? "bg-green-500"
-                          : "bg-red-500"
+      ? "bg-yellow-500"
+      : user.isProfileStatus === "Approved"
+      ? "bg-green-500"
+      : user.isProfileStatus === "Rejected"
+      ? "bg-red-500"
+      : user.isProfileStatus === "Blocked"
+      ? "bg-gray-700"
+      : "bg-gray-400"
                       }`}
                     >
                       {user.isProfileStatus}
                     </span>
                   </td>
                   <td className="px-2 sm:px-4 py-2">
-                    <div className="flex justify-center items-center gap-2 sm:gap-4">
-                      <div
+                  <div
                         onClick={() => handleFullDetails(user._id)}
-                        className="flex items-center justify-center h-full group relative cursor-pointer"
-                      >
-                        <MdOutlineVisibility size={20} className="text-primary" />
+                        className="flex items-center justify-center h-full group relative cursor-pointer">
+                        <MdOutlineVisibility
+                          size={26}
+                          className="text-primary"
+                        />
                         <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
                           View Profile
                         </span>
                       </div>
-                      <div
+                  </td>
+                  <td className="px-2 sm:px-4 py-2">
+                  <div
                         onClick={() => handleDeleteFullDetails(user._id)}
-                        className="flex items-center justify-center h-full group relative cursor-pointer"
-                      >
-                        <MdOutlineDeleteForever size={20} className="text-red-700" />
+                        className="flex items-center justify-center h-full group relative cursor-pointer">
+                        <MdOutlineDeleteForever
+                          size={26}
+                          className="text-red-700"
+                        />
                         <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
                           Delete Profile
                         </span>
                       </div>
-                    </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="text-center py-6 text-black font-bold">
+                <td
+                  colSpan="7"
+                  className="text-center py-6 text-black font-bold"
+                >
                   No users found.
                 </td>
               </tr>
@@ -163,7 +189,9 @@ const Users = () => {
           </button>
         ))}
         <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold border-primary border-2"
         >
           Next

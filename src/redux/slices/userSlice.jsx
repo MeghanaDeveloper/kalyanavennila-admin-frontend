@@ -12,17 +12,14 @@ const adminUserSlice = createSlice({
   initialState,
   reducers: {
     setAdminLoginUser: (state, action) => {
-      console.log("login", action);
       state.isAdminAuthenticated = true;
       state.userName = action.payload;
     },
     setGetAllUserDetails: (state, action) => {
-      console.log("get admin", action);
       state.isAdminAuthenticated = true;
       state.userDetails = action.payload ;
     },
     setUpdateProfileStatus: (state,action) => {
-      console.log("get admin status", action);
       const updatedUser = action.payload;
       state.userProfileStatus = {
         ...state.userProfileStatus,
@@ -31,7 +28,6 @@ const adminUserSlice = createSlice({
       state.userDetails = state.userDetails.result.map(user =>
         user._id === updatedUser._id ? { ...user, ...updatedUser } : user
       );
-      console.log("get admin status", state.userDetails );
     },
     setDeleteUserById: (state, action) => {
       const userIdToDelete = action.payload;

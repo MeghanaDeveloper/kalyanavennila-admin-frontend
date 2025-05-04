@@ -24,7 +24,6 @@ export const getAllUserClickTrackings = async () => {
         };
       }
     } catch (error) {
-      console.log(error);
       const errors = error.response?.data?.error;
       toast.error(errors, {
         position: "top-center",

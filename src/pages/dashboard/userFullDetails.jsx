@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import Breadcrumb from "../../components/common/breadcrumb";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -12,6 +12,7 @@ import {
   FaLandmark,
   FaTag,
   FaBirthdayCake,
+  FaUserCircle,
   FaHeart,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,18 +21,21 @@ import {
   getDocumentURL,
 } from "../../services/adminApis";
 import toast from "react-hot-toast";
-import {
-  approveProfileDetails,
-  rejectProfileDetails,
-} from "../../services/adminProfileStatusApis";
+import { approveProfileDetails } from "../../services/adminProfileStatusApis";
+import StatusModals from "./statusModals";
 
 const UserFullDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
 
   const [previewURL, setPreviewURL] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [actionType, setActionType] = useState("reject");
 
-  const allUsersData = useSelector( (state) => state?.userReducer?.userDetails?.result);
+  const allUsersData = useSelector(
+    (state) => state?.userReducer?.userDetails?.result
+  );
 
   const userData = allUsersData?.find((u) => u._id === id);
 
@@ -54,21 +58,7 @@ const UserFullDetails = () => {
     } catch (error) {
       toast.error(error.message);
     }
-
-    // if (result?.success) {
-    //   console.log("Profile approved successfully");
-    // }
   };
-
-  const handleRejectProfile = async (profileId) => {
-    try {
-      await dispatch(rejectProfileDetails(profileId));
-      await getAllUsersFullDetails(dispatch);
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
-
   return (
     <>
       <Breadcrumb
@@ -86,6 +76,22 @@ const UserFullDetails = () => {
         <p className="text-primary text-center font-bold text-4xl pb-9">
           My Profile
         </p>
+
+        {userData && userData.rejectionReason ? (
+          <div className="px-6 md:px-16 pb-12 w-full">
+            <p className=" text-3xl font-bold text-red-600">
+              Rejection Reason:
+            </p>
+            <p className="text-2xl px-2">{userData.rejectionReason}</p>
+          </div>
+        ) : null}
+
+        {userData && userData.blockedReason ? (
+          <div className="px-6 md:px-16 pb-12 w-full">
+            <p className=" text-3xl font-bold text-red-600">Blocked Reason:</p>
+            <p className="text-2xl px-2">{userData.blockedReason}</p>
+          </div>
+        ) : null}
 
         <div className="flex justify-center items-center gap-14 pb-14 flex-wrap  px-6 md:px-14">
           <img
@@ -107,6 +113,14 @@ const UserFullDetails = () => {
 
         <div className="flex justify-center items-center flex-col px-5 md:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 gap-y-6 gap-x-12  text-lg">
+          <div className="flex items-center gap-5">
+                <FaUserCircle className="text-primary" />
+                <div>
+                  <p className="font-bold text-gray-700">My Account ID:</p>
+                  <p className="text-gray-600">{userData?.accountId}</p>
+                </div>
+              </div>
+
             <div className="flex items-center gap-5">
               <FaBirthdayCake className="text-primary" />
               <div>
@@ -273,12 +287,12 @@ const UserFullDetails = () => {
           </div>
         </div>
 
-        <div className="flex justify-end items-center gap-9 px-5 md:px-20 py-10 flex-wrap">
+        <div className="flex justify-end items-center gap-9 px-5 md:px-20 pt-16 pb-10 flex-wrap">
           <div>
             <button
               onClick={() => handleApproveProfile(userData?._id)}
               disabled={userData?.isProfileStatus === "Approved"}
-              className={`button-styles px-4 ${
+              className={`button-styles px-9 ${
                 userData?.isProfileStatus === "Approved"
                   ? "bg-gray-400 cursor-not-allowed opacity-60"
                   : "button-styles "
@@ -290,9 +304,13 @@ const UserFullDetails = () => {
 
           <div>
             <button
-              onClick={() => handleRejectProfile(userData?._id)}
+              onClick={() => {
+                setSelectedUserId(userData?._id);
+                setActionType("reject");
+                setShowModal(true);
+              }}
               disabled={userData?.isProfileStatus === "Rejected"}
-              className={`button-styles px-6 ${
+              className={`button-styles px-9 ${
                 userData?.isProfileStatus === "Rejected"
                   ? "bg-gray-400 cursor-not-allowed opacity-60"
                   : "button-styles"
@@ -301,8 +319,33 @@ const UserFullDetails = () => {
               Reject Profile
             </button>
           </div>
+
+          <div>
+            <button
+              onClick={() => {
+                setSelectedUserId(userData?._id);
+                setActionType("block");
+                setShowModal(true);
+              }}
+              disabled={userData?.isProfileStatus === "Blocked"}
+              className={`button-styles px-9 ${
+                userData?.isProfileStatus === "Blocked"
+                  ? "bg-gray-400 cursor-not-allowed opacity-60"
+                  : "button-styles"
+              }`}
+            >
+              Block Profile
+            </button>
+          </div>
         </div>
       </div>
+
+      <StatusModals
+        show={showModal}
+        handleClose={() => setShowModal(false)}
+        userId={selectedUserId}
+        actionType={actionType}
+      />
     </>
   );
 };
