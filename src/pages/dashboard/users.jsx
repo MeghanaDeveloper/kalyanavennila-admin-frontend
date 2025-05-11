@@ -14,6 +14,8 @@ const Users = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+
   const usersPerPage = 8;
 
   const navigate = useNavigate();
@@ -44,10 +46,19 @@ const Users = () => {
   };
 
   // Filtered Users
-  const filteredUsers =
-    filterStatus === "All"
-      ? allUsersData
-      : allUsersData?.filter((user) => user.isProfileStatus === filterStatus);
+  // Filtered and Searched Users
+  const filteredUsers = allUsersData
+    ?.filter((user) =>
+      filterStatus === "All" ? true : user.isProfileStatus === filterStatus
+    )
+    ?.filter((user) => {
+      const fullName =
+        `${user.surName} ${user.firstName} ${user.lastName}`.toLowerCase();
+      return (
+        user.accountId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        fullName.includes(searchQuery.toLowerCase())
+      );
+    });
 
   // Pagination Logic
   const totalPages = Math.ceil(filteredUsers?.length / usersPerPage);
@@ -58,11 +69,23 @@ const Users = () => {
   return (
     <>
       <Breadcrumb paths={[{ label: "Users", path: "/admin/users" }]} />
-      <h1 className="text-2xl font-bold mb-2 text-primary">Users</h1>
 
-      <div className="flex flex-wrap justify-end items-center mb-9">
-        <div className="flex gap-2 items-center">
-          <label className="text-lg  text-gray-700">Filter by Status:</label>
+      <h1 className="text-2xl font-bold mb-3 text-primary">Users</h1>
+
+      <div className="flex justify-between items-center flex-wrap gap-9 mb-9">
+        <div className="flex items-center gap-2 flex-wrap">
+          <label className="text-lg">Search:</label>
+          <input
+            type="text"
+            placeholder="Account ID or Name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border border-gray-500 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-52"
+          />
+        </div>
+
+        <div className="flex gap-2 items-center flex-wrap">
+          <label className="text-lg">Filter by Status:</label>
           <select
             className="border border-gray-500 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-44"
             value={filterStatus}
@@ -113,44 +136,43 @@ const Users = () => {
                     <span
                       className={`px-4 py-2 rounded-full font-bold text-white text-xs sm:text-sm ${
                         user.isProfileStatus === "Pending"
-      ? "bg-yellow-500"
-      : user.isProfileStatus === "Approved"
-      ? "bg-green-500"
-      : user.isProfileStatus === "Rejected"
-      ? "bg-red-500"
-      : user.isProfileStatus === "Blocked"
-      ? "bg-gray-700"
-      : "bg-gray-400"
+                          ? "bg-yellow-500"
+                          : user.isProfileStatus === "Approved"
+                          ? "bg-green-500"
+                          : user.isProfileStatus === "Rejected"
+                          ? "bg-red-500"
+                          : user.isProfileStatus === "Blocked"
+                          ? "bg-gray-700"
+                          : "bg-gray-400"
                       }`}
                     >
                       {user.isProfileStatus}
                     </span>
                   </td>
                   <td className="px-2 sm:px-4 py-2">
-                  <div
-                        onClick={() => handleFullDetails(user._id)}
-                        className="flex items-center justify-center h-full group relative cursor-pointer">
-                        <MdOutlineVisibility
-                          size={26}
-                          className="text-primary"
-                        />
-                        <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
-                          View Profile
-                        </span>
-                      </div>
+                    <div
+                      onClick={() => handleFullDetails(user._id)}
+                      className="flex items-center justify-center h-full group relative cursor-pointer"
+                    >
+                      <MdOutlineVisibility size={26} className="text-primary" />
+                      <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
+                        View Profile
+                      </span>
+                    </div>
                   </td>
                   <td className="px-2 sm:px-4 py-2">
-                  <div
-                        onClick={() => handleDeleteFullDetails(user._id)}
-                        className="flex items-center justify-center h-full group relative cursor-pointer">
-                        <MdOutlineDeleteForever
-                          size={26}
-                          className="text-red-700"
-                        />
-                        <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
-                          Delete Profile
-                        </span>
-                      </div>
+                    <div
+                      onClick={() => handleDeleteFullDetails(user._id)}
+                      className="flex items-center justify-center h-full group relative cursor-pointer"
+                    >
+                      <MdOutlineDeleteForever
+                        size={26}
+                        className="text-red-700"
+                      />
+                      <span className="absolute bottom-full mb-2 hidden group-hover:block text-xs bg-black text-white px-2 py-1 rounded shadow-md whitespace-nowrap z-10">
+                        Delete Profile
+                      </span>
+                    </div>
                   </td>
                 </tr>
               ))

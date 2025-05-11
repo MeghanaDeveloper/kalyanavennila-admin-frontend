@@ -21,7 +21,7 @@ const Dashboard = () => {
 
       <h1 className="text-2xl font-bold mb-14 text-primary">Dashboard</h1>
 
-      <div className="bg-white rounded-2xl shadow-md p-10 mb-9 w-[24vw] flex items-center justify-center gap-6">
+      <div className="bg-white rounded-2xl shadow-md p-10 mb-9 md:max-w-[24vw] max-w-[70vw] flex items-center justify-center gap-6">
           <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-red-100 text-red-600">
             <FaClipboardUser size={28} />
           </div>

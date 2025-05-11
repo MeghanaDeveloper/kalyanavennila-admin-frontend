@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Breadcrumb from "../../components/common/breadcrumb";
 import { Link, useParams } from "react-router-dom";
 import {
-  FaMapMarkerAlt,
+  FaSpinner,
   FaPhone,
   FaBuilding,
   FaTransgender,
@@ -11,10 +11,15 @@ import {
   FaPrayingHands,
   FaLandmark,
   FaTag,
+  FaGlobeAmericas,
+  FaCity ,
   FaBirthdayCake,
-  FaUserCircle,
   FaHeart,
+  FaUserCircle,
+  FaEnvelope,
+  FaGlobe,
 } from "react-icons/fa";
+import { GiCapitol } from "react-icons/gi";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllUsersFullDetails,
@@ -32,6 +37,7 @@ const UserFullDetails = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [actionType, setActionType] = useState("reject");
+  const [loading, setLoading] = useState(false);
 
   const allUsersData = useSelector(
     (state) => state?.userReducer?.userDetails?.result
@@ -52,11 +58,14 @@ const UserFullDetails = () => {
   };
 
   const handleApproveProfile = async (profileId) => {
+    setLoading(true);
     try {
       await dispatch(approveProfileDetails(profileId));
       await getAllUsersFullDetails(dispatch);
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -72,54 +81,81 @@ const UserFullDetails = () => {
         User Full Details
       </h1>
 
-      <div className="bg-white mx-auto py-16 shadow-md rounded-3xl relative">
+      <div className="bg-blue-50 mx-auto py-16 shadow-xl rounded-3xl relative">
         <p className="text-primary text-center font-bold text-4xl pb-9">
           My Profile
         </p>
 
-        {userData && userData.rejectionReason ? (
-          <div className="px-6 md:px-16 pb-12 w-full">
-            <p className=" text-3xl font-bold text-red-600">
-              Rejection Reason:
-            </p>
-            <p className="text-2xl px-2">{userData.rejectionReason}</p>
+        {loading && (
+          <div className="absolute inset-0 bg-white/70 flex justify-center items-center z-10">
+            <FaSpinner className="text-primary animate-spin text-4xl" />
           </div>
-        ) : null}
+        )}
 
-        {userData && userData.blockedReason ? (
-          <div className="px-6 md:px-16 pb-12 w-full">
-            <p className=" text-3xl font-bold text-red-600">Blocked Reason:</p>
-            <p className="text-2xl px-2">{userData.blockedReason}</p>
+        {(userData?.rejectionReason || userData?.blockedReason) && (
+          <div className="bg-gray-50 shadow-md rounded-2xl mx:px-14 px-6 py-10 mb-8 md:mx-10 mx-4">
+            {userData.rejectionReason && (
+              <>
+                <p className="text-3xl font-bold text-red-600">
+                  Rejection Reason:
+                </p>
+                <p className="text-2xl pt-3">{userData.rejectionReason}</p>
+              </>
+            )}
+
+            {userData.blockedReason && (
+              <div className="pt-6">
+                <p className="text-3xl font-bold text-red-600">
+                  Blocked Reason:
+                </p>
+                <p className="text-2xl pt-3">{userData.blockedReason}</p>
+              </div>
+            )}
           </div>
-        ) : null}
+        )}
 
-        <div className="flex justify-center items-center gap-14 pb-14 flex-wrap  px-6 md:px-14">
-          <img
-            src={userData?.profilePic}
-            alt="Profile"
-            className="w-32 h-32 text-center rounded-full border-3 border-primary shadow-lg"
-          />
+        <div className="bg-gray-50 shadow-md rounded-2xl mx:px-14  px-6 py-10 mb-8 md:mx-10 mx-4 ">
+          <div className="flex justify-start items-center gap-14 flex-wrap">
+            <img
+              src={userData?.profilePic}
+              alt="Profile"
+              className="w-44 h-44 text-center rounded-2xl border-3 border-primary shadow-lg"
+            />
 
-          <div>
-            <p className="text-center text-3xl font-bold text-gray-800 pb-4 px-6 md:px-14">
+            <p className="text-center text-3xl font-bold text-gray-800 pt-6 pb-2">
               {userData?.surName} {userData?.firstName} {userData?.lastName}
-            </p>
-
-            <p className="text-center text-lg text-gray-600">
-              {userData?.email}
+              <br />
+              <span className=" text-xl"> [{userData?.accountId}]</span>
+              <span className="block text-gray-400 text-base">
+                (Profile Created By {userData?.accountCreatedBy})
+              </span>
             </p>
           </div>
         </div>
 
-        <div className="flex justify-center items-center flex-col px-5 md:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 gap-y-6 gap-x-12  text-lg">
-          <div className="flex items-center gap-5">
-                <FaUserCircle className="text-primary" />
-                <div>
-                  <p className="font-bold text-gray-700">My Account ID:</p>
-                  <p className="text-gray-600">{userData?.accountId}</p>
-                </div>
+        <div className="bg-gray-50 shadow-md rounded-2xl mx:px-14  px-6 py-10 mb-8 md:mx-10 mx-4 ">
+          <p className="text-2xl font-bold text-primary mb-4">
+            Personal Information
+          </p>
+
+          <div className="flex items-center gap-5 pb-6">
+            <FaEnvelope className="text-primary" />
+            <div>
+              <p className="font-bold text-gray-700">Email:</p>
+              <p className="text-gray-600">{userData?.email}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-lg">
+            <div className="flex items-center gap-5">
+              <FaUserCircle className="text-primary" />
+              <div>
+                <p className="font-bold text-gray-700">Full Name:</p>
+                <p className="text-gray-600">
+                  {userData?.surName} {userData?.firstName} {userData?.lastName}
+                </p>
               </div>
+            </div>
 
             <div className="flex items-center gap-5">
               <FaBirthdayCake className="text-primary" />
@@ -142,14 +178,6 @@ const UserFullDetails = () => {
             </div>
 
             <div className="flex items-center gap-5">
-              <FaPhone className="text-primary" />
-              <div>
-                <p className="font-bold text-gray-700">Mobile Number:</p>
-                <p className="text-gray-600">{userData?.mobile}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-5">
               <FaTransgender className="text-primary" />
               <div>
                 <p className="font-bold text-gray-700">Gender:</p>
@@ -165,6 +193,26 @@ const UserFullDetails = () => {
               </div>
             </div>
 
+            <div className="flex items-center gap-5">
+              <FaGlobe className="text-primary" />
+              <div>
+                <p className="font-bold text-gray-700">Known Languages:</p>
+                <p className="text-gray-600">
+                  {Array.isArray(userData?.languages)
+                    ? userData.languages.join(", ")
+                    : userData?.languages || "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <hr className="my-8 text-gray-400" />
+
+          <p className="text-2xl font-bold text-primary mb-4">
+            Community Information
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-lg">
             <div className="flex items-center gap-5">
               <FaPrayingHands className="text-primary" />
               <div>
@@ -188,7 +236,54 @@ const UserFullDetails = () => {
                 <p className="text-gray-600">{userData?.subCaste}</p>
               </div>
             </div>
+          </div>
+        </div>
 
+        <div className="bg-gray-50 shadow-md rounded-2xl px-6 py-10 mb-8 md:mx-10 mx-4">
+          <p className="text-2xl font-bold text-primary mb-4">
+            Communication Information
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-lg">
+            <div className="flex items-center gap-5">
+              <FaPhone className="text-primary" />
+              <div>
+                <p className="font-bold text-gray-700">Mobile Number:</p>
+                <p className="text-gray-600">{userData?.mobile}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-5">
+                <FaGlobeAmericas className="text-primary" />
+                <div>
+                  <p className="font-bold text-gray-700">Country:</p>
+                  <p className="text-gray-600">{userData?.locationDetails?.country?.name}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-5">
+                <GiCapitol className="text-primary" />
+                <div>
+                  <p className="font-bold text-gray-700">State :</p>
+                  <p className="text-gray-600">{userData?.locationDetails?.state?.name}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-5">
+                <FaCity className="text-primary" />
+                <div>
+                  <p className="font-bold text-gray-700">City:</p>
+                  <p className="text-gray-600">{userData?.locationDetails?.city?.name}</p>
+                </div>
+              </div>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 shadow-md rounded-2xl px-6 py-10 mb-8 md:mx-10 mx-4">
+          <p className="text-2xl font-bold text-primary mb-4">
+            Education / Profession details
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-lg">
             <div className="flex items-center gap-5">
               <FaGraduationCap className="text-primary" />
               <div>
@@ -209,19 +304,15 @@ const UserFullDetails = () => {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div className="flex items-center gap-5">
-              <FaMapMarkerAlt className="text-primary" />
-              <div>
-                <p className="font-bold text-gray-700">Known Languages:</p>
-                <p className="text-gray-600">
-                  {Array.isArray(userData?.languages)
-                    ? userData.languages.join(", ")
-                    : userData?.languages || "N/A"}
-                </p>
-              </div>
-            </div>
+        <div className="bg-gray-50 shadow-md rounded-2xl px-6 py-10 mb-8 md:mx-10 mx-4">
+          <p className="text-2xl font-bold text-primary mb-4">
+            Uploaded Document Information
+          </p>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-lg">
             <div className="flex items-center gap-5">
               <FaBuilding className="text-primary" />
               <div>
@@ -237,19 +328,21 @@ const UserFullDetails = () => {
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="border-b-2 py-5 border-gray-100"></div>
-
-          <p className="text-primary font-bold text-2xl pl-16 py-7">
-            My Partner Preferences :
+        <div className="bg-gray-50 shadow-md rounded-2xl px-6 py-10 mb-8 md:mx-10 mx-4">
+          <p className="text-2xl font-bold text-primary mb-4">
+            My Partner Preferences
           </p>
 
-          <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-6 text-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-lg">
             <div className="flex items-center gap-5">
               <FaHeart className="text-primary" />
               <div>
                 <p className="font-bold text-gray-700">Looking For:</p>
-                <p className="text-gray-600">{userData?.lookingFor}</p>
+                <p className="text-gray-600">
+                  {userData?.partnerPreferences?.lookingFor}
+                </p>
               </div>
             </div>
 
@@ -257,7 +350,9 @@ const UserFullDetails = () => {
               <FaHeart className="text-primary" />
               <div>
                 <p className="font-bold text-gray-700">Partner Age:</p>
-                <p className="text-gray-600">{userData?.partnerAge}</p>
+                <p className="text-gray-600">
+                  {userData?.partnerPreferences?.partnerAge}
+                </p>
               </div>
             </div>
 
@@ -265,7 +360,9 @@ const UserFullDetails = () => {
               <FaLanguage className="text-primary" />
               <div>
                 <p className="font-bold text-gray-700">Mother Tongue:</p>
-                <p className="text-gray-600">{userData?.partnerMotherTongue}</p>
+                <p className="text-gray-600">
+                  {userData?.partnerPreferences?.partnerMotherTongue}
+                </p>
               </div>
             </div>
 
@@ -273,7 +370,9 @@ const UserFullDetails = () => {
               <FaLandmark className="text-primary" />
               <div>
                 <p className="font-bold text-gray-700">Caste:</p>
-                <p className="text-gray-600">{userData?.partnerCaste}</p>
+                <p className="text-gray-600">
+                  {userData?.partnerPreferences?.partnerCaste}
+                </p>
               </div>
             </div>
 
@@ -281,61 +380,65 @@ const UserFullDetails = () => {
               <FaPrayingHands className="text-primary" />
               <div>
                 <p className="font-bold text-gray-700">Religion:</p>
-                <p className="text-gray-600">{userData?.partnerReligion}</p>
+                <p className="text-gray-600">
+                  {userData?.partnerPreferences?.partnerReligion}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-end items-center gap-9 px-5 md:px-20 pt-16 pb-10 flex-wrap">
-          <div>
-            <button
-              onClick={() => handleApproveProfile(userData?._id)}
-              disabled={userData?.isProfileStatus === "Approved"}
-              className={`button-styles px-9 ${
-                userData?.isProfileStatus === "Approved"
-                  ? "bg-gray-400 cursor-not-allowed opacity-60"
-                  : "button-styles "
-              }`}
-            >
-              Approve Profile
-            </button>
-          </div>
+        <div className="bg-gray-50 shadow-md rounded-2xl px-6 py-10 mb-8 md:mx-10 mx-4">
+          <div className="flex justify-end items-center gap-9 flex-wrap">
+            <div>
+              <button
+                onClick={() => handleApproveProfile(userData?._id)}
+                disabled={userData?.isProfileStatus === "Approved"}
+                className={`button-styles rounded-2xl px-9 ${
+                  userData?.isProfileStatus === "Approved"
+                    ? "bg-gray-400 cursor-not-allowed opacity-60"
+                    : "button-styles "
+                }`}
+              >
+                Approve Profile
+              </button>
+            </div>
 
-          <div>
-            <button
-              onClick={() => {
-                setSelectedUserId(userData?._id);
-                setActionType("reject");
-                setShowModal(true);
-              }}
-              disabled={userData?.isProfileStatus === "Rejected"}
-              className={`button-styles px-9 ${
-                userData?.isProfileStatus === "Rejected"
-                  ? "bg-gray-400 cursor-not-allowed opacity-60"
-                  : "button-styles"
-              }`}
-            >
-              Reject Profile
-            </button>
-          </div>
+            <div>
+              <button
+                onClick={() => {
+                  setSelectedUserId(userData?._id);
+                  setActionType("reject");
+                  setShowModal(true);
+                }}
+                disabled={userData?.isProfileStatus === "Rejected"}
+                className={`button-styles rounded-2xl px-9 ${
+                  userData?.isProfileStatus === "Rejected"
+                    ? "bg-gray-400 cursor-not-allowed opacity-60"
+                    : "button-styles"
+                }`}
+              >
+                Reject Profile
+              </button>
+            </div>
 
-          <div>
-            <button
-              onClick={() => {
-                setSelectedUserId(userData?._id);
-                setActionType("block");
-                setShowModal(true);
-              }}
-              disabled={userData?.isProfileStatus === "Blocked"}
-              className={`button-styles px-9 ${
-                userData?.isProfileStatus === "Blocked"
-                  ? "bg-gray-400 cursor-not-allowed opacity-60"
-                  : "button-styles"
-              }`}
-            >
-              Block Profile
-            </button>
+            <div>
+              <button
+                onClick={() => {
+                  setSelectedUserId(userData?._id);
+                  setActionType("block");
+                  setShowModal(true);
+                }}
+                disabled={userData?.isProfileStatus === "Blocked"}
+                className={`button-styles rounded-2xl px-9 ${
+                  userData?.isProfileStatus === "Blocked"
+                    ? "bg-gray-400 cursor-not-allowed opacity-60"
+                    : "button-styles"
+                }`}
+              >
+                Block Profile
+              </button>
+            </div>
           </div>
         </div>
       </div>
